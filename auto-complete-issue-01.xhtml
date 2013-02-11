@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:ev="http://www.w3.org/2001/xml-events" 
+      xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms" 
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xf="http://www.w3.org/2002/xforms">
+<head>
+	<meta name="ROBOTS" CONTENT="NONE,NOARCHIVE,NOFOLLOW" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<title>Test-Auto-Complete-Issue</title>
+	<xf:model id="coreModel">
+		<xf:instance xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms" id="constants" xxf:readonly="true">
+			<constants xmlns="">
+				<diaryStatus>
+					<status>
+						<name>Booked</name>
+						<value>Booked</value>
+						<color>GREY</color>
+					</status>
+					<status>
+						<name>Arrived</name>
+						<value>Arrived</value>
+						<color>RED</color>
+					</status>
+					<status>
+						<name>Did Not Show</name>
+						<value>DidNotShow</value>
+						<color>YELLOW</color>
+					</status>
+					<status>
+						<name>Blocked</name>
+						<value>Blocked</value>
+						<color>GREY</color>
+					</status>
+					<status>
+						<name>Cancelled</name>
+						<value>Cancelled</value>
+						<color>WHITE</color>
+					</status>
+				</diaryStatus>			
+			</constants>
+		</xf:instance>	
+		<xf:instance xmlns:xf="http://www.w3.org/2002/xforms" id="appointmentList">
+			<examinations xmlns="">
+				<descriptions>
+					<name>Introduction</name>
+				</descriptions>
+				<descriptions>
+					<name>Follow-up</name>
+				</descriptions>
+				<descriptions>
+					<name>Revision</name>
+				</descriptions>
+			</examinations>
+		</xf:instance>		
+	</xf:model>
+	<xf:model id="diaryModel">
+		<xf:instance id="booking">
+			<booking xmlns="">
+				<slotKey/>
+				<location1/>
+				<location2/>
+				<location3/>
+				<gSummary/>
+				<gdStart/>
+				<gtStart/>
+				<gtEnd/>
+				<dstart/>
+				<tstart/>
+				<dend/>
+				<tend/>
+				<summary/>
+				<attendee/>
+				<attendeeName/>
+				<contact/>
+				<description/>
+				<status/>
+				<ftype/>
+			</booking>
+		</xf:instance>
+		<xf:bind nodeset="instance('booking')">
+			<xf:bind nodeset="tstart" required="true()"/>
+			<xf:bind nodeset="tend" required="true()"/>	
+			<xf:bind nodeset="gdStart" type="xs:date" readonly="false()" calculate="if (xs:string(.) = '') then xs:date(substring(xs:string(current-date()),1,10)) else ." />
+			<xf:bind nodeset="dstart" required="true()" type="xs:date" readonly="false()" calculate="if (xs:string(.) = '') then xs:date(substring(xs:string(current-date()),1,10)) else ." />
+			<xf:bind nodeset="dend" required="true()" type="xs:date" readonly="false()" calculate="if (xs:string(.) = '') then xs:date(substring(xs:string(current-date()),1,10)) else ." />
+		</xf:bind>
+		
+		<xf:instance id="diaries">
+			<Diaries xmlns="">
+				<IND>
+					<diary><name>Do not Book Individual</name><value>IGNORE</value></diary>
+					<diary><name>Dave Jones</name><value>1</value></diary>
+					<diary><name>Robert Smith</name><value>2</value></diary>
+				</IND>
+				<FAC>
+					<diary><name>Do not Book Room</name><value>IGNORE</value></diary>
+					<diary><name>Lecture Theatre 1</name><value>L1</value></diary>
+					<diary><name>Lecture Theatre 2</name><value>L2</value></diary>
+				</FAC>
+			</Diaries>
+		</xf:instance>				
+	</xf:model>
+</head>
+<body>
+	<xxf:dialog id="dialogAppointment" draggable="true" model="diaryModel" appearance="full" level="modal"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns:xf="http://www.w3.org/2002/xforms"
+	xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+	xmlns:f="http://orbeon.org/oxf/xml/formatting">
+	
+		<f:label>Booking</f:label>	
+		
+		<div style="width: 450px; height: 500px;" class="screenBlock">
+			<br />
+                <div style="font-weight: bold; line-height: 28px; height: 440px; width: 125px; float: left;">
+                    Director<br /> Assistant<br /> Room<br /> Start Session<br /> End Session<br /> Appointment<br />
+                    Attendee<br /> Contact<br /> Description<br /><br /><br /> Status<br />
+                </div>
+                <xf:group ref="instance('booking')">
+                    <div style="line-height: 28px; height: 440px; width: 300px; float: left; verticalAlign: middle;">
+                        <xf:select1 ref="location1">
+                            <xf:label/>
+                            <xf:itemset nodeset="instance('diaries')/IND/diary">
+                                <xf:label ref="name"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                        <br />		
+                        <xf:select1 ref="location2">
+                            <xf:label/>
+                            <xf:itemset nodeset="instance('diaries')/IND/diary">
+                                <xf:label ref="name"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                        <br />	
+                        <xf:select1 ref="location3">
+                            <xf:label/>
+                            <xf:itemset nodeset="instance('diaries')/FAC/diary">
+                                <xf:label ref="name"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                        <br />	
+                        <xf:input ref="dstart" xxf:size="10">
+                            <xf:label>
+                                <xf:output ref="dstart" xxf:format="format-date(xs:date(.), '[FNn]')" />
+                            </xf:label>
+                            <xf:action ev:event="DOMFocusOut">
+                                <xf:setvalue ref="instance('booking')/dend" value="instance('booking')/dstart"/>
+                            </xf:action>
+                        </xf:input>	
+                        <xf:input ref="tstart" xxf:size="5" >
+                            <xf:label> at </xf:label>
+                            <xf:action ev:event="DOMFocusOut">
+                                <xf:setvalue ref="instance('booking')/dend" value="instance('booking')/dstart"/>
+                            </xf:action>
+                        </xf:input>	
+                        <br />	
+                        <xf:input ref="dend" xxf:size="10">
+                            <xf:label>
+                                <xf:output ref="dend" xxf:format="format-date(xs:date(.), '[FNn]')" />
+                            </xf:label>
+                        </xf:input>	
+                        <xf:input ref="tend" xxf:size="5" >
+                            <xf:label> at </xf:label>
+                        </xf:input>
+                        <br />	
+                        <fr:autocomplete id="bookingDescription" ref="summary" dynamic-itemset="false" max-results-displayed="25" show-full-itemset-dropdown="true">
+                            <xf:label></xf:label>
+                            <xf:itemset model="coreModel" nodeset="instance('appointmentList')/descriptions">
+                                <xf:label ref="name"/>
+                                <xf:value ref="name"/>
+                            </xf:itemset> 					    
+                        </fr:autocomplete>
+                        <xf:input ref="attendeeName" xxf:size="40em;">
+                            <xf:label/>
+                        </xf:input>
+                        <xf:trigger appearance="compact">
+                            <xf:label>^</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                            </xf:action>
+                        </xf:trigger>				
+                        <br />
+                        <xf:input ref="contact">
+                            <xf:label/>
+                        </xf:input>	
+                        <br />
+                        <xf:textarea ref="description" xxf:cols="50" xxf:rows="5" style="resize: none;" />
+                        <br />
+                        <xf:select1 ref="status">
+                            <xf:label/>
+                            <xf:itemset model="coreModel" nodeset="instance('constants')/diaryStatus/status">
+                                <xf:label ref="name"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                        </xf:select1>	
+                        <br />
+                        <br />
+                        <div style="width: 60px;" class="PrimaryButton">
+                            <xf:trigger appearance="minimal">
+                                <xf:label>Save</xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                	<xxf:hide dialog="dialogAppointment"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </div>													
+                        <br />																					
+                    </div>
+                </xf:group>
+                <div style="clear: both;"></div>
+			<br />
+		</div>		
+	</xxf:dialog>
+	
+	<xf:trigger appearance="full">
+		<xf:label>Enable Dialog</xf:label>
+		<xf:action ev:event="DOMActivate">
+			<xxf:show dialog="dialogAppointment"/>
+		</xf:action>
+	</xf:trigger>
+</body>
+</html>
